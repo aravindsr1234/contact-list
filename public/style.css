@@ -1,0 +1,29 @@
+.header{
+    text-align: center;
+    padding: 20px 0;
+    font-weight: 100 !important;
+}
+.container{
+    max-width: 1195px !important;
+}
+.modal-body{
+    display: flex;
+    flex-direction: column;
+}
+label{
+    margin-right: 20px;
+}
+input{
+    width: 100%;
+    padding: 7px;
+    border-radius: 5px;
+}
+.input_row{
+    padding: 10px;
+}
+.btn-primary{
+    margin-bottom: 10px;
+}
+.btn-danger{
+    margin-left: 10px;
+}
