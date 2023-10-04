@@ -41,3 +41,6 @@ input[type=search]{
     right: 10px;
     top: 10px;
 }
+.pagination{
+    float: right;
+}

@@ -8,12 +8,16 @@ function Content() {
      * desc: Get data from mongodb
      */
     const [data, setData] = useState([]);
+    console.log(data);
+    const [length, setLength] = useState([]);
+    console.log(length);
 
     useEffect(() => {
         getData();
     }, []);
 
-    let currentPage = 1;
+    // let currentPage = 1;
+    const [currentPage, setCurrentPage] = useState(1);
     let itemsPerPage = 10;
 
     const getData = () => {
@@ -25,7 +29,8 @@ function Content() {
         })
             .then((res) => {
                 console.log(res.data);
-                setData(res.data);
+                setData(res.data.data);
+                setLength(res.data.length);
             })
     };
 
@@ -150,9 +155,9 @@ function Content() {
     }
 
     useEffect(() => {
-        myr();
+        enter();
     }, [])
-    const myr = () => {
+    const enter = () => {
         axios.get(`http://localhost:3001/search/?term=${searched}`)
             .then((res) => {
                 console.log(res.data)
@@ -163,6 +168,40 @@ function Content() {
                 }
             })
     }
+
+    const page = (page) => {
+        axios.get(`http://localhost:3001/get/?page=${page}`)
+            .then((res) => {
+                // currentPage = page;
+                setCurrentPage(page);
+                console.log(res.data.data);
+                setData(res.data.data);
+            })
+    }
+
+    const renderPaginationButtons = () => {
+        const buttons = [];
+        const totalPages = Math.ceil(length / 10);
+        if (totalPages > 1) {
+            for (let i = 1; i <= totalPages; i++) {
+                buttons.push(
+                    <li
+                        key={i}
+                        className={`page-item ${currentPage === i ? 'active' : ''}`}
+                    >
+                        <a
+                            className="page-link"
+                            href="#"
+                            onClick={() => page(i)}
+                        >
+                            {i}
+                        </a>
+                    </li>
+                );
+            }
+        }
+        return buttons;
+    };
 
     return (
         <div className="container">
@@ -210,7 +249,7 @@ function Content() {
                 {/* Add MODAL END */}
 
                 <div>
-                    <input type="search" placeholder="Search" onChange={search} onKeyDown={myr} />
+                    <input type="search" placeholder="Search" onChange={search} onKeyDown={enter} />
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </div>
             </div>
@@ -280,6 +319,16 @@ function Content() {
                     )}
                 </tbody>
             </table>
+
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    {/* <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#" onClick={ ()=>{page(2)}}>2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li> */}
+
+                    {renderPaginationButtons()}
+                </ul>
+            </nav>
 
         </div>
     )
