@@ -27,3 +27,17 @@ input{
 .btn-danger{
     margin-left: 10px;
 }
+.forAdd{
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+input[type=search]{
+    width: 200px;
+    height: 35px;
+}
+.fa-magnifying-glass{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
