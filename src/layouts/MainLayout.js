@@ -4,7 +4,7 @@ import { Header } from "../components/Header";
 function MainLayout() {
     return(
         <div>
-            <Header />
+            {/* <Header /> */}
         </div>
     )
 }

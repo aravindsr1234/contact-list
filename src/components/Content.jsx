@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Header } from "./Header";
 import axios from "axios"
 
 function Content() {
@@ -20,19 +21,22 @@ function Content() {
     const [currentPage, setCurrentPage] = useState(1);
     let itemsPerPage = 10;
 
-    const getData = () => {
-        axios.get('http://localhost:3001/get', {
-            params: {
-                page: currentPage,
-                limit: itemsPerPage,
-            }
-        })
-            .then((res) => {
-                console.log(res.data);
-                setData(res.data.data);
-                setLength(res.data.length);
-            })
+    const getData = async () => {
+        try {
+            const response = await axios.get('http://localhost:3001/get', {
+                params: {
+                    page: currentPage,
+                    limit: itemsPerPage,
+                }
+            });
+            console.log(response.data);
+            setData(response.data.data);
+            setLength(response.data.length);
+        } catch (error) {
+            console.error("An error occurred while fetching data:", error);
+        }
     };
+
 
     /**
      * Author: Aravind
@@ -109,36 +113,54 @@ function Content() {
      * Author: Aravind
      * desc: edit data in the mongodb
      */
-    const getEditData = (id) => {
-        axios.get(`http://localhost:3001/get/?id=${id}`)
-            .then(response => {
-                console.log("get data to edit", response);
-                setPostData({ ...postData, firstName: response.data.firstName, lastName: response.data.lastName, number: response.data.number, id: response.data._id });
-            })
-    }
+    const getEditData = async (id) => {
+        try {
+            const response = await axios.get(`http://localhost:3001/get/?id=${id}`);
+            console.log("get data to edit", response);
+            setPostData({
+                ...postData,
+                firstName: response.data.firstName,
+                lastName: response.data.lastName,
+                number: response.data.number,
+                id: response.data._id
+            });
+        } catch (error) {
+            console.error("An error occurred while fetching edit data:", error);
+        }
+    };
 
-    const editData = (id) => {
-        axios.put(`http://localhost:3001/update/?id=${id}`, postData)
-            .then(response => {
-                console.log("update", response);
-                getData();
-                setPostData({
-                    firstName: "",
-                    lastName: "",
-                    number: "",
-                })
-            })
-    }
+    const editData = async (id) => {
+        try {
+            const response = await axios.put(`http://localhost:3001/update/?id=${id}`, postData);
+            console.log("update", response);
 
+            getData();
+            setPostData({
+                firstName: "",
+                lastName: "",
+                number: "",
+            });
+        } catch (error) {
+            console.error("An error occurred while updating data:", error);
+        }
+    };
+
+    const [deleteIdIn, setdeleteIdIn] = useState('');
+    console.log(deleteIdIn);
+    const deleteId = (id) => {
+        console.log(id);
+        setdeleteIdIn(id);
+    }
     /**
      * Author: Aravind
      * desc: delelte data in the mongodb
      */
-    const deleteData = (id) => {
-        axios.delete(`http://localhost:3001/delete/?id=${id}`)
+    const deleteData = (deleteIdIn) => {
+        axios.delete(`http://localhost:3001/delete/?id=${deleteIdIn}`)
             .then(response => {
                 console.log("delete", response);
                 getData();
+                setdeleteIdIn('');
             })
     }
 
@@ -205,6 +227,9 @@ function Content() {
 
     return (
         <div className="container">
+            <div>
+                <Header length={length} />
+            </div>
             <div className="forAdd">
                 {/* button for Add contacts
             <!-- Button trigger modal --> */}
@@ -308,7 +333,7 @@ function Content() {
                                 <td>{item.number}</td>
                                 <td>
                                     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editModal" onClick={() => getEditData(item._id)}>edit</button>
-                                    <button type="button" className="btn btn-danger" onClick={() => { deleteData(item._id) }}>Delete</button>
+                                    <button type="button" className="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delteModal" onClick={() => deleteId(item._id)}>Delete</button>
                                 </td>
                             </tr>
                         ))
@@ -322,13 +347,27 @@ function Content() {
 
             <nav aria-label="Page navigation example">
                 <ul class="pagination">
-                    {/* <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#" onClick={ ()=>{page(2)}}>2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li> */}
-
                     {renderPaginationButtons()}
                 </ul>
             </nav>
+
+            <div class="modal fade" id="delteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Add Contacts</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete contact
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger" onClick={() => { deleteData(deleteIdIn) }}>Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div>
     )
